@@ -13,8 +13,14 @@
         // Non device oreintation specific sizing
         CGRect screenBounds = externalScreen.bounds;
 
-        self.externalWebView = [[WKWebView alloc] initWithFrame: screenBounds
+        // Lay out at 1080p and scale up on larger displays so content isn't tiny on 2K/4K
+        CGFloat zoom = MAX(1.0, MIN(screenBounds.size.width / 1920.0, screenBounds.size.height / 1080.0));
+        CGRect layoutBounds = CGRectMake(0, 0, screenBounds.size.width / zoom, screenBounds.size.height / zoom);
+
+        self.externalWebView = [[WKWebView alloc] initWithFrame: layoutBounds
                                                   configuration: [[WKWebViewConfiguration alloc] init]];
+        self.externalWebView.center = CGPointMake(CGRectGetMidX(screenBounds), CGRectGetMidY(screenBounds));
+        self.externalWebView.transform = CGAffineTransformMakeScale(zoom, zoom);
         self.externalWindow = [[UIWindow alloc] initWithFrame: screenBounds];
 
         // Disable overscan so content goes to edge of screen
